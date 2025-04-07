@@ -3,6 +3,7 @@
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { Suspense } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -229,4 +230,12 @@ const AuthForm = ({ type }: { type: FormType }) => {
   );
 };
 
-export default AuthForm;
+const AuthFormWrapper = ({ type }: { type: FormType }) => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AuthForm type={type} />
+    </Suspense>
+  );
+};
+
+export default AuthFormWrapper;
