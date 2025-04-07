@@ -68,9 +68,9 @@ app
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/nayankumar21/OnmiDrive.git
+git clone https://github.com/NAYANKUMAR21/OmniDrive.git
 
-cd OnmiDrive
+cd OmniDrive
 
 npm install
 
