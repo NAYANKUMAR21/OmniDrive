@@ -148,8 +148,8 @@ export const GoogleLogin = async () => {
   const { account } = await createAdminClient();
   const redirectUrl = await account.createOAuth2Token(
     OAuthProvider.Google,
-    'http://localhost:3000/sign-in',
-    'http://localhost:3000/sign-in'
+    'https://omni-drive.vercel.app/sign-in',
+    'https://omni-drive.vercel.app/sign-in'
   );
   console.log(2, account);
 
