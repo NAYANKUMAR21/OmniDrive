@@ -46,6 +46,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [accountId, setAccountId] = useState(null);
   const urlSearchParams = useSearchParams();
+  const [OAuthLoading, setOAuthLoading] = useState<boolean>(false);
   const formSchema = authFormSchema(type);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -77,30 +78,38 @@ const AuthForm = ({ type }: { type: FormType }) => {
     }
   };
   const handleGoogleOAuth = async () => {
-    setIsLoading(true);
+    setOAuthLoading(true);
+    // localStorage.setItem('OAuth', 'true');
     setErrorMessage('');
     await GoogleLogin();
+    setOAuthLoading(false);
   };
   useEffect(() => {
     const userId = urlSearchParams.get('userId');
     const secret = urlSearchParams.get('secret');
     console.log(userId, secret);
+
     if (!userId || !secret) {
       return console.log('Couldnt login ');
     }
+    setOAuthLoading(true);
 
+    // if (userId && secret) {
     getTheSession(userId, secret)
       .then((res) => {
+        localStorage.setItem('OAuth', 'false');
         console.log(res);
-        setIsLoading(false);
+        // setIsLoading(false);
         setErrorMessage('');
         router.push('/');
+        setOAuthLoading(false);
       })
       .catch((er: any) => {
         setIsLoading(false);
         setErrorMessage(er.message);
         console.log(er);
       });
+    // }
   }, []);
   return (
     <>
@@ -193,7 +202,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
                   alt="google logo"
                 />
                 {type == 'sign-in' ? 'Sign-in' : 'Sign-up'} with Google
-                {isLoading && (
+                {OAuthLoading && (
                   <Image
                     src="/assets/icons/loader.svg"
                     alt="loader"
