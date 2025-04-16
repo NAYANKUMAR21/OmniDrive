@@ -27,8 +27,8 @@ const Dashboard = async () => {
         <h2 className="h3 xl:h2 text-white">Recent files uploaded</h2>
         {files.documents.length > 0 ? (
           <ul className="mt-5 flex flex-col gap-5">
-            {files.documents.map((file: Models.Document) => (
-              <div>
+            {files.documents.map((file: Models.Document, index:number) => (
+              <div key={index}>
                 <Link
                   href={file.url}
                   target="_blank"
