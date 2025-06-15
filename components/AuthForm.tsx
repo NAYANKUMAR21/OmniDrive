@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { Suspense } from 'react';
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Suspense } from "react";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -13,28 +13,28 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import {
   createAccount,
   getCurrentUser,
   getTheSession,
   GoogleLogin,
   signInUser,
-} from '@/lib/actions/user.actions';
-import OtpModal from '@/components/OTPModal';
-import { useRouter, useSearchParams } from 'next/navigation';
+} from "@/lib/actions/user.actions";
+import OtpModal from "@/components/OTPModal";
+import { useRouter, useSearchParams } from "next/navigation";
 
-type FormType = 'sign-in' | 'sign-up';
+type FormType = "sign-in" | "sign-up";
 
 const authFormSchema = (formType: FormType) => {
   return z.object({
     email: z.string().email(),
     fullName:
-      formType === 'sign-up'
+      formType === "sign-up"
         ? z.string().min(2).max(50)
         : z.string().optional(),
   });
@@ -43,7 +43,7 @@ const authFormSchema = (formType: FormType) => {
 const AuthForm = ({ type }: { type: FormType }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   const [accountId, setAccountId] = useState(null);
   const urlSearchParams = useSearchParams();
   const [OAuthLoading, setOAuthLoading] = useState<boolean>(false);
@@ -52,27 +52,27 @@ const AuthForm = ({ type }: { type: FormType }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fullName: '',
-      email: '',
+      fullName: "",
+      email: "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
-    setErrorMessage('');
+    setErrorMessage("");
 
     try {
       const user =
-        type === 'sign-up'
+        type === "sign-up"
           ? await createAccount({
-              fullName: values.fullName || '',
+              fullName: values.fullName || "",
               email: values.email,
             })
           : await signInUser({ email: values.email });
 
       setAccountId(user.accountId);
     } catch {
-      setErrorMessage('Failed to create account. Please try again.');
+      setErrorMessage("Failed to create account. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -80,28 +80,28 @@ const AuthForm = ({ type }: { type: FormType }) => {
   const handleGoogleOAuth = async () => {
     setOAuthLoading(true);
     // localStorage.setItem('OAuth', 'true');
-    setErrorMessage('');
+    setErrorMessage("");
     await GoogleLogin();
     setOAuthLoading(false);
   };
   useEffect(() => {
-    const userId = urlSearchParams.get('userId');
-    const secret = urlSearchParams.get('secret');
+    const userId = urlSearchParams.get("userId");
+    const secret = urlSearchParams.get("secret");
     console.log(userId, secret);
 
     if (!userId || !secret) {
-      return console.log('Couldnt login ');
+      return console.log("Couldnt login ");
     }
     setOAuthLoading(true);
 
     // if (userId && secret) {
     getTheSession(userId, secret)
       .then((res) => {
-        localStorage.setItem('OAuth', 'false');
+        localStorage.setItem("OAuth", "false");
         console.log(res);
         // setIsLoading(false);
-        setErrorMessage('');
-        router.push('/');
+        setErrorMessage("");
+        router.push("/");
         setOAuthLoading(false);
       })
       .catch((er: any) => {
@@ -116,7 +116,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="auth-form">
           <h1 className="form-title">
-            {type === 'sign-in' ? (
+            {type === "sign-in" ? (
               <span>
                 <span className="text-black">Sign </span>I
                 <span className="text-orange">n</span>
@@ -128,7 +128,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
               </span>
             )}
           </h1>
-          {type === 'sign-up' && (
+          {type === "sign-up" && (
             <FormField
               control={form.control}
               name="fullName"
@@ -140,7 +140,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
                     <FormControl>
                       <Input
                         placeholder="Enter your full name"
-                        className="shad-input"
+                        className="shad-input text-white"
                         {...field}
                       />
                     </FormControl>
@@ -173,14 +173,14 @@ const AuthForm = ({ type }: { type: FormType }) => {
             )}
           />
           <div
-            className={`w-full ${type == 'sign-in' ? 'flex justify-around items-center' : ''}`}
+            className={`w-full ${type == "sign-in" ? "flex justify-around items-center" : ""}`}
           >
             <Button
               type="submit"
-              className={`rounded-xl p-5 ${type == 'sign-in' ? 'w-[40%]' : 'w-full'}`}
+              className={`rounded-xl p-5 ${type == "sign-in" ? "w-[40%]" : "w-full"}`}
               disabled={isLoading}
             >
-              {type === 'sign-in' ? 'Sign In' : 'Sign Up'}
+              {type === "sign-in" ? "Sign In" : "Sign Up"}
 
               {isLoading && (
                 <Image
@@ -193,15 +193,15 @@ const AuthForm = ({ type }: { type: FormType }) => {
               )}
             </Button>
 
-            {type == 'sign-in' && (
+            {type == "sign-in" && (
               <Button onClick={handleGoogleOAuth} className="rounded-xl p-5">
                 <Image
-                  src={'https://img.icons8.com/color/512/google-logo.png'}
+                  src={"https://img.icons8.com/color/512/google-logo.png"}
                   width={24}
                   height={24}
                   alt="google logo"
                 />
-                {type == 'sign-in' ? 'Sign-in' : 'Sign-up'} with Google
+                {type == "sign-in" ? "Sign-in" : "Sign-up"} with Google
                 {OAuthLoading && (
                   <Image
                     src="/assets/icons/loader.svg"
@@ -217,23 +217,23 @@ const AuthForm = ({ type }: { type: FormType }) => {
           {errorMessage && <p className="error-message">*{errorMessage}</p>}
           <div className="body-2 flex justify-center">
             <p className="text-white">
-              {type === 'sign-in'
+              {type === "sign-in"
                 ? "Don't have an account?"
-                : 'Already have an account?'}
+                : "Already have an account?"}
             </p>
             <Link
-              href={type === 'sign-in' ? '/sign-up' : '/sign-in'}
+              href={type === "sign-in" ? "/sign-up" : "/sign-in"}
               className="ml-1 font-medium text-white"
             >
-              {' '}
-              {type === 'sign-in' ? 'Sign Up' : 'Sign In'}
+              {" "}
+              {type === "sign-in" ? "Sign Up" : "Sign In"}
             </Link>
           </div>
         </form>
       </Form>
 
       {accountId && (
-        <OtpModal email={form.getValues('email')} accountId={accountId} />
+        <OtpModal email={form.getValues("email")} accountId={accountId} />
       )}
     </>
   );

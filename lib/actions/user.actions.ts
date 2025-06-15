@@ -1,12 +1,12 @@
-'use server';
+"use server";
 
-import { createAdminClient, createSessionClient } from '@/lib/appwrite';
-import { appwriteConfig } from '@/lib/appwrite/config';
-import { Query, ID, OAuthProvider, Client, Account } from 'node-appwrite';
-import { parseStringify } from '@/lib/utils';
-import { cookies } from 'next/headers';
-import { avatarPlaceholderUrl } from '@/constants';
-import { redirect } from 'next/navigation';
+import { createAdminClient, createSessionClient } from "@/lib/appwrite";
+import { appwriteConfig } from "@/lib/appwrite/config";
+import { Query, ID, OAuthProvider, Client, Account } from "node-appwrite";
+import { parseStringify } from "@/lib/utils";
+import { cookies } from "next/headers";
+import { avatarPlaceholderUrl } from "@/constants";
+import { redirect } from "next/navigation";
 
 const getUserByEmail = async (email: string) => {
   const { databases } = await createAdminClient();
@@ -14,7 +14,7 @@ const getUserByEmail = async (email: string) => {
   const result = await databases.listDocuments(
     appwriteConfig.databaseId,
     appwriteConfig.usersCollectionId,
-    [Query.equal('email', [email])]
+    [Query.equal("email", [email])]
   );
 
   return result.total > 0 ? result.documents[0] : null;
@@ -33,7 +33,7 @@ export const sendEmailOTP = async ({ email }: { email: string }) => {
 
     return session.userId;
   } catch (error) {
-    handleError(error, 'Failed to send email OTP');
+    handleError(error, "Failed to send email OTP");
   }
 };
 
@@ -47,7 +47,7 @@ export const createAccount = async ({
   const existingUser = await getUserByEmail(email);
 
   const accountId = await sendEmailOTP({ email });
-  if (!accountId) throw new Error('Failed to send an OTP');
+  if (!accountId) throw new Error("Failed to send an OTP");
 
   if (!existingUser) {
     const { databases } = await createAdminClient();
@@ -80,16 +80,16 @@ export const verifySecret = async ({
 
     const session = await account.createSession(accountId, password);
 
-    (await cookies()).set('appwrite-session', session.secret, {
-      path: '/',
+    (await cookies()).set("appwrite-session", session.secret, {
+      path: "/",
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: "strict",
       secure: true,
     });
 
     return parseStringify({ sessionId: session.$id });
   } catch (error) {
-    handleError(error, 'Failed to verify OTP');
+    handleError(error, "Failed to verify OTP");
   }
 };
 
@@ -102,7 +102,7 @@ export const getCurrentUser = async () => {
     const user = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.usersCollectionId,
-      [Query.equal('accountId', result.$id)]
+      [Query.equal("accountId", result.$id)]
     );
 
     if (user.total <= 0) return { found: false, ...result };
@@ -117,12 +117,12 @@ export const signOutUser = async () => {
   const { account } = await createSessionClient();
 
   try {
-    await account.deleteSession('current');
-    (await cookies()).delete('appwrite-session');
+    await account.deleteSession("current");
+    (await cookies()).delete("appwrite-session");
   } catch (error) {
-    handleError(error, 'Failed to sign out user');
+    handleError(error, "Failed to sign out user");
   } finally {
-    redirect('/sign-in');
+    redirect("/sign-in");
   }
 };
 
@@ -136,9 +136,9 @@ export const signInUser = async ({ email }: { email: string }) => {
       return parseStringify({ accountId: existingUser.accountId });
     }
 
-    return parseStringify({ accountId: null, error: 'User not found' });
+    return parseStringify({ accountId: null, error: "User not found" });
   } catch (error) {
-    handleError(error, 'Failed to sign in user');
+    handleError(error, "Failed to sign in user");
   }
 };
 
@@ -161,7 +161,7 @@ export const getTheSession = async (userId: string, secret: string) => {
     const { account } = await createAdminClient();
     const session = await account.createSession(userId, secret);
 
-    console.log('session from the sesssion', session);
+    console.log("session from the sesssion", session);
     const userClient = new Client()
       .setEndpoint(appwriteConfig.endpointUrl)
       .setProject(appwriteConfig.projectId)
@@ -171,12 +171,12 @@ export const getTheSession = async (userId: string, secret: string) => {
 
     // 3. Now you can get user info
     const result = await userAccount.get(); // ✅ works now!
-    console.log('result userAccount = ', result);
+    console.log("result userAccount = ", result);
     await createAccount({ fullName: result.email, email: result.email });
-    (await cookies()).set('appwrite-session', session.secret, {
-      path: '/',
+    (await cookies()).set("appwrite-session", session.secret, {
+      path: "/",
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: "strict",
       secure: true,
     });
     return parseStringify(session);
